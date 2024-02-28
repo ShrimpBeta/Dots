@@ -35,7 +35,8 @@ public class Constants
     public const string ListSdksCommand = "--list-sdks";
     public static string ReleaseInfoUrl = "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/";
     public static string ReleaseInfoUrlEnd = "/releases.json";
-    public static string ReleaseIndexUrl = "https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json";
+    //  use GitHub Mirror 
+    public static string ReleaseIndexUrl = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json";
     public static string ReleaseIndexPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName, "release-index.json");
     public static string ReleaseIndexKey = "release-index-key";
     public static string ReleaseBaseKey = "release-key-";
