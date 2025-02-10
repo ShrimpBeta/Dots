@@ -1,6 +1,8 @@
-name: build and release
+name: build validation
 
+# run it on dispatch or for every PR
 on:
+  pull_request:
   workflow_dispatch:
 
 
@@ -110,63 +112,3 @@ jobs:
       with:
         name: windowsarm64file
         path: ${{ github.workspace }}\src\*x86.zip
-
-  create-release:
-    needs: [build-macos, build-windows]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-      - name: Get Version via powershell
-        shell: pwsh
-        id: get_version
-        run: |
-          $version = Get-Content -Path $env:GITHUB_WORKSPACE/version.txt
-          $env:CURRENT_VERSION = $version.ToString()
-          echo "::set-output name=CURRENT_VERSION::$env:CURRENT_VERSION"
-      - name: run housekeeping scripts
-        run: |
-          cd $GITHUB_WORKSPACE/scripts
-          bash housekeeping.sh
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: macosx64file
-          path: $GITHUB_WORKSPACE
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: macosarm64file
-          path: $GITHUB_WORKSPACE
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: windowsx86file
-          path: $GITHUB_WORKSPACE
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: windowsx64file
-          path: $GITHUB_WORKSPACE
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: windowsarm64file
-          path: $GITHUB_WORKSPACE
-
-      - name: Display structure of downloaded files
-        run: |
-          cd $GITHUB_WORKSPACE
-          ls
-      - name: Create GitHub Tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: false
-          custom_tag: ${{ steps.get_version.outputs.CURRENT_VERSION }}
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-            tag: ${{ steps.tag_version.outputs.new_tag }}
-            name: Release ${{ steps.get_version.outputs.CURRENT_VERSION }}
-            artifacts: |
-              $GITHUB_WORKSPACE/*.zip
-            token: ${{ secrets.GITHUB_TOKEN }}
-            generateReleaseNotes: true
-            draft: true
